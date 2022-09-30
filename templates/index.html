@@ -2,30 +2,10 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Login
+
 {% endblock %}
 
+
 {% block main %}
-
-    <section id="seccion">
-        <div class="izquierda">
-            <br> <br>
-            <h1> Iniciar sesion</h1>
-            <h3>Ingrese sus datos</h3> <br>
-
-            <form action="/login" method="post" id="register">
-                <div class="mb-3">
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" type="text" name="username" placeholder="username" id="username" required>
-                </div>
-                <br>
-                <div class="mb-3">
-                    <input class="form-control mx-auto w-auto" id="password" type="password" name="password" placeholder="password" required>
-                </div>
-                <br>
-                <button class="btn btn-primary" type="submit" id="submit"> Iniciar sesion </button>
-            </form>
-        </div>
-
-    </section>
 
 {% endblock %}
