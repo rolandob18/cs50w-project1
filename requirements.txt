@@ -1,0 +1,16 @@
+Flask
+Flask-Session
+psycopg2-binary
+SQLAlchemy
+cachelib        
+click          
+colorama  
+getenv       
+greenlet         
+itsdangerous     
+Jinja2          
+MarkupSafe      
+pip             
+python-dotenv   
+setuptools     
+Werkzeug        
