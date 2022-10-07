@@ -2,10 +2,38 @@
 {% extends "layout.html" %}
 
 {% block title %}
-
+    
 {% endblock %}
 
 
 {% block main %}
+
+    {% if session.user_id %}
+        <br>
+        <div>
+            <h3>Busqueda</h3><br>
+            <form action="/results" method="post">
+                <div class="form-group">
+                    <input style="width:300px;"autocomplete="off" autofocus class="form-control" name="buscar" placeholder="Ingresar isbn, titulo, autor, o año" type="text">
+                </div> <br>
+                <button class="btn -primary" id_btn="button_busqueda" type="submit">Buscar</button>
+            </form>
+        </div>
+            {% else %}
+        <div>
+            <div id="info_div">
+                <div id="info_div">
+                    <H3>Por favor iniciar sesion</H3>
+                    <h5>Obtiene los siguientes beneficios:</h5><br>
+                    <h6> Busqueda de libros</h6>
+                    <h6> Busqueda de autores</h6>
+                    <h6> Ver las reseñas</h6>
+                    <h6> Escribir reseñas</h6>
+                    </div>
+            </div>
+        </div>
+
+    {% endif %}
+
 
 {% endblock %}
