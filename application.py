@@ -102,24 +102,27 @@ def logout():
     session.clear()
     return redirect("/")
 
-@app.route("/busqueda")
+@app.route("/busqueda", methods=["GET","POST"])
 def busqueda():
 
-    buscar = request.args.get("buscar")
-    value = request.args.get("value")
+    buscar = request.form.get("buscar")
+    #value = request.form.get("value")
     resultados = []
+    
+    d =  f"%{buscar}%"
+    resultados = db.execute("SELECT * FROM libros WHERE isbn LIKE :buscar or title LIKE :buscar or author LIKE :buscar or year LIKE :buscar", {"buscar": d }).fetchall()
 
-    if buscar in {"isbn", "author", "title"}:
-        resultados = db.execute("SELECT * FROM libros WHERE %s LIKE :value" % buscar, {"value": "%" + value + "%"}).fetchall()
+    #print(resultados)
+    return render_template("libros_libros.html", resultados=resultados, buscar= buscar)    
 
-    return render_template("busqueda.html", buscar=buscar, value=value, resultados=resultados)    
+    #HASTA AQUI VA BIEN
 
 @app.route("/libro/<isbn>", methods=["GET", "POST"])
 def libro(isbn):
     usuarios_id = session.get("user_id")
 
     if usuarios_id:
-        libro = db.execute("SELECT * FROM libros WHERE isbn= :isbn", {"isbn": isbn}).fetchone()
+        libro = db.execute("SELECT * FROM libros WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
         
         if libro is None:
             abort(404)
@@ -166,7 +169,7 @@ def libro_api(isbn):
             "isbn": isbn,
             "title": libro.title,
             "author": libro.author,
-            "publicacion": libro.title,
+            "publicacion": libro.year,
             "review_count": libro.review_count,
             "average_score": libro.average_score
         })
