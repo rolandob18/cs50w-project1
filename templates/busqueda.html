@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Busqueda
+{% endblock %}
+
+
+{% block main %}
+
+    <h2>Buscando resultados  donde {{ buscar }} contiene "{{ value }}"</h2>
+    {% if resultados %}
+
+    <table>
+        <tr>
+            <th>isbn</th>
+            <th>title</th>
+            <th>author</th>
+            <th>year</th>
+        </tr>
+    {% for fila in resultados%}
+    <tr>
+        <td><a href="{{url_for('libro', isbn=fila.isbn) }}">{{ fila.isbn }}</a></td>
+        <td>{{ fila.title }}</td>
+        <td>{{ fila.author }}</td>
+        <td>{{ fila.year }}</td>
+    </tr>
+    
+    {% endfor %}
+    </table>
+    
+    {% else %}
+        <p>prueba</p>
+        
+    {% endif %}
+
+{% endblock %}
