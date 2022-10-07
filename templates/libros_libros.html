@@ -7,10 +7,10 @@
 
 {% block main %}
 
-    <h2>Buscando resultados  donde {{ buscar }} contiene "{{ value }}"</h2>
     {% if resultados %}
+    <h2>Buscando resultados de {{ buscar }}"</h2>
 
-    <table>
+    <table class="mx-auto w-auto" ">
         <tr>
             <th>isbn</th>
             <th>title</th>
@@ -19,7 +19,7 @@
         </tr>
     {% for fila in resultados%}
     <tr>
-        <td><a href="{{url_for('libro', isbn=fila.isbn) }}">{{ fila.isbn }}</a></td>
+        <td>{{ fila.isbn }}</td>
         <td>{{ fila.title }}</td>
         <td>{{ fila.author }}</td>
         <td>{{ fila.year }}</td>
@@ -29,7 +29,7 @@
     </table>
     
     {% else %}
-        <p>prueba</p>
+        <p>Sin resultados</p>
         
     {% endif %}
 
