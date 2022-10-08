@@ -1,13 +1,14 @@
 #from crypt import methods
 from distutils.log import error
 from http.client import NotConnected
+from operator import ge
 import os
 import re
 from socket import errorTab
 from unittest import result
 from click import password_option
 
-from flask import flash,redirect, render_template, Flask, request, session, abort, url_for, current_app, jsonify
+from flask import flash, g,redirect, render_template, Flask, request, session, abort, url_for, current_app, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -70,16 +71,12 @@ def register():
     else:
         username = request.form.get("username")
         password = request.form.get("password")
-        confirmation = request.form.get("confirmation")
-
+        
         if not username:
             flash("Ingrese un nombre")
             return render_template("register.html")
         if not password:
             flash("Ingrese una contrasña")
-            return render_template("register.html")
-        if not confirmation:
-            flash("confirme su contraseña")
             return render_template("register.html")
 
         hash = generate_password_hash(password)
@@ -102,7 +99,7 @@ def logout():
     session.clear()
     return redirect("/")
 
-@app.route("/busqueda", methods=["GET","POST"])
+@app.route("/libros_libros", methods=["GET","POST"])
 def busqueda():
 
     buscar = request.form.get("buscar")
@@ -113,7 +110,7 @@ def busqueda():
     resultados = db.execute("SELECT * FROM libros WHERE isbn LIKE :buscar or title LIKE :buscar or author LIKE :buscar or year LIKE :buscar", {"buscar": d }).fetchall()
 
     #print(resultados)
-    return render_template("libros_libros.html", resultados=resultados, buscar= buscar)    
+    return render_template("libros_libros.html", resultados=resultados, buscar=buscar)    
 
     #HASTA AQUI VA BIEN
 
@@ -131,7 +128,7 @@ def libro(isbn):
                 db.execute(" INSERT INTO critica comentario, puntaje, usuarios_id, libros_id  VALUES (:comentario, :puntaje, :usuario_id, :libros_id); ", 
                 {"comentario": request.form.get('comentario'),
                 "puntaje": request.form.get('puntaje'),"usuarios_id":usuarios_id, "libros_id": libro.id})
-                
+
                 db.commit()
                 return redirect(url_for("libro", isbn=isbn))
             else:
