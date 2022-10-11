@@ -8,9 +8,9 @@
 {% block main %}
 
     {% if resultados %}
-    <h2>Buscando resultados de {{ buscar }}</h2>
+    <h2 style="color: aliceblue;">Buscando resultados de {{ buscar }}</h2>
 
-    <table class="mx-auto w-auto" class="table table-striped-columns">
+    <table class="table table-success table-striped">
         <tr>
             <th>isbn</th>
             <th>title</th>
@@ -19,7 +19,7 @@
         </tr>
     {% for fila in resultados%}
     <tr>
-        <td>{{ fila.isbn }}</td>
+        <td><a href="{{url_for('libro', isbn=fila.isbn) }}">{{ fila.isbn }}</a></td>
         <td>{{ fila.title }}</td>
         <td>{{ fila.author }}</td>
         <td>{{ fila.year }}</td>
@@ -29,7 +29,7 @@
     </table>
     
     {% else %}
-        <p>Sin resultados</p>
+        <p style="color: aliceblue;">Sin resultados</p>
         
     {% endif %}
 
