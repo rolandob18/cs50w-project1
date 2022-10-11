@@ -1,0 +1,11 @@
+main{
+    /* background-color: rgb(190, 186, 199); */
+    background-image: url("/static/fondo2.jpeg") ;
+    height: 130vh;
+    background-size: cover;
+    background-position: center;
+}
+
+#info_div{
+    color: aliceblue;
+}
