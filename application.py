@@ -8,14 +8,13 @@ from socket import errorTab
 from unittest import result
 from click import password_option
 
-from flask import flash, g,redirect, render_template, Flask, request, session, abort, url_for, current_app, jsonify
+from flask import Blueprint, flash, g,redirect, render_template, Flask, request, session, abort, url_for, current_app, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required, apology
 import requests
-
 
 app = Flask(__name__)
 
@@ -30,6 +29,8 @@ Session(app)
 
 # Set up database
 engine = create_engine("postgresql://setruvhdhepzne:14dde31f92e7cfd1bed1083f125402dc352cd503bc851057fccddafca4b5c551@ec2-34-227-135-211.compute-1.amazonaws.com:5432/dd7jm4tkdkdbed")
+llave = os.getenv("llave")
+
 db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
@@ -51,7 +52,6 @@ def login():
         else:
             usuario = db.execute("SELECT * FROM usuarios WHERE username = username", {"username": request.form.get('username')}).fetchone()
 
-            #if usuario and check_password_hash(usuario.password_hash, request.form.get('password')):
             if usuario:
                 session["user_id"] = usuario.id
                 return render_template("index.html")
@@ -103,13 +103,11 @@ def logout():
 def busqueda():
 
     buscar = request.form.get("buscar")
-    #value = request.form.get("value")
     resultados = []
     
     d =  f"%{buscar}%"
     resultados = db.execute("SELECT * FROM libros WHERE isbn LIKE :buscar or title LIKE :buscar or author LIKE :buscar or year LIKE :buscar", {"buscar": d }).fetchall()
 
-    #print(resultados)
     return render_template("libros_libros.html", resultados=resultados, buscar=buscar)    
 
     #HASTA AQUI VA BIEN
@@ -122,22 +120,22 @@ def libro(isbn):
         libro = db.execute("SELECT * FROM libros WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
         
         if libro is None:
-            abort(404)
+            flash("error")
         else:
             if request.method == "POST":
-                db.execute(" INSERT INTO critica comentario, puntaje, usuarios_id, libros_id  VALUES (:comentario, :puntaje, :usuario_id, :libros_id); ", 
+                db.execute(" INSERT INTO critica (comentario, puntaje, usuarios_id, libros_id)  VALUES (:comentario, :puntaje, :usuarios_id, :libros_id); ", 
                 {"comentario": request.form.get('comentario'),
                 "puntaje": request.form.get('puntaje'),"usuarios_id":usuarios_id, "libros_id": libro.id})
 
                 db.commit()
                 return redirect(url_for("libro", isbn=isbn))
             else:
-                comentario = db.execute(" SELECT usuarios_id, comentario, puntaje, FROM  critica JOIN usuarios ON usuarios.id=critica.usuarios_id  WHERE libros_id=:libros_id ", {"libros_id": libro.id}).fetchall()
+                comentario = db.execute(" SELECT usuarios_id, comentario, puntaje, username FROM critica JOIN usuarios ON usuarios.id=critica.usuarios_id  WHERE libros_id=:libros_id ", {"libros_id": libro.id}).fetchall()
 
                 lectura = {}
                 if current_app.config.get("llave"):
-                    res = request.get("https://www.goodreads.com/book/review_counts.json", 
-                    parametros = {"key": current_app.config.get("key"), "isbn": isbn }, timeout=5)
+                    res = request.get("https://www.goodreads.com/libro/critica.json", 
+                    parametros = {"key": current_app.config.get("llave"), "isbn": isbn }, timeout=5)
 
                     if res.status_code != 200:
                         raise Exception("ERROR NO TUVO EXITO")
@@ -149,13 +147,13 @@ def libro(isbn):
         abort(403)
 
 
-@app.route("api/libro/<isbn>", methods=["GET", "POST"])
+@app.route("/api/libro/<isbn>", methods=["GET", "POST"])
 def libro_api(isbn):
 
-    libro = db.execute("SELECT libros.id, libros.title, libros.author, libros.year COUNT(critica.puntaje) AS review_count, AVG(critica.puntaje) AS average_score FROM libros LEFT JOIN critica ON libros.id= critica.libros_id WHERE libros.isbn=:isbn GROUP BY libros.id ", {"isbn": isbn}).fetchone()
+    libro = db.execute("""SELECT libros.id, libros.title, libros.author, libros.year,                             COUNT(critica.puntaje) AS review_count,                 AVG(critica.puntaje) AS average_score                   FROM libros                                             LEFT JOIN critica ON libros.id= critica.libros_id       WHERE libros.isbn=:isbn GROUP BY libros.id """,       {"isbn": isbn}).fetchone()
 
     if libro is None:
-        return jsonify({"ERROR: isbn invalido"}), 422
+        return jsonify({"ERROR ":404}), 404
     else:
         if libro.average_score is not None:
             average_score = round(float(libro.average_score), 2)
@@ -166,7 +164,7 @@ def libro_api(isbn):
             "isbn": isbn,
             "title": libro.title,
             "author": libro.author,
-            "publicacion": libro.year,
+            "year": libro.year,
             "review_count": libro.review_count,
             "average_score": libro.average_score
         })
