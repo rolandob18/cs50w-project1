@@ -1,7 +1,7 @@
 # Project 1
 Web Programming with Python and JavaScript
 
-En application.py hize la conexion a la db por que me daba problemas en la terminal y por ultimo en este archivo esta todo el backend del project1.
+En application.py hize la conexion a la db por que me daba problemas en la terminal en este archivo esta todo el backend del project1.
 
 En valores.py inserte a la db los datos del archivo books.csv .
 
