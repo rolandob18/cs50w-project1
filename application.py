@@ -150,7 +150,7 @@ def libro(isbn):
 @app.route("/api/libro/<isbn>", methods=["GET", "POST"])
 def libro_api(isbn):
 
-    libro = db.execute("""SELECT libros.id, libros.title, libros.author, libros.year,                             COUNT(critica.puntaje) AS review_count,                 AVG(critica.puntaje) AS average_score                   FROM libros                                             LEFT JOIN critica ON libros.id= critica.libros_id       WHERE libros.isbn=:isbn GROUP BY libros.id """,       {"isbn": isbn}).fetchone()
+    libro = db.execute("SELECT libros.id, libros.title, libros.author, libros.year, COUNT(critica.puntaje) AS review_count, AVG(critica.puntaje) AS average_score FROM libros LEFT JOIN critica ON libros.id= critica.libros_id WHERE libros.isbn=:isbn GROUP BY libros.id ", {"isbn": isbn}).fetchone()
 
     if libro is None:
         return jsonify({"ERROR ":404}), 404
@@ -166,5 +166,5 @@ def libro_api(isbn):
             "author": libro.author,
             "year": libro.year,
             "review_count": libro.review_count,
-            "average_score": libro.average_score
+            "average_score": average_score
         })
