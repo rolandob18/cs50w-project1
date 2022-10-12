@@ -19,8 +19,8 @@
         </tr>
     {% for fila in resultados%}
     <tr>
-        <td><a href="{{url_for('libro', isbn=fila.isbn) }}">{{ fila.isbn }}</a></td>
-        <td>{{ fila.title }}</td>
+        <td>{{ fila.isbn }}</td>
+        <td><a href="{{url_for('libro', isbn=fila.isbn) }}">{{ fila.title }}</a</td>
         <td>{{ fila.author }}</td>
         <td>{{ fila.year }}</td>
     </tr>
