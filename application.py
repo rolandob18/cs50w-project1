@@ -25,6 +25,7 @@ app = Flask(__name__)
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 Session(app)
 
 # Set up database
@@ -50,14 +51,18 @@ def login():
             flash("escriba una contraseña")
         
         else:
-            usuario = db.execute("SELECT * FROM usuarios WHERE username = username", {"username": request.form.get('username')}).fetchone()
-
-            if usuario:
-                session["user_id"] = usuario.id
+            usuario = db.execute("SELECT * FROM usuarios WHERE username = :username", {"username": request.form.get('username')}).fetchall()
+            
+            if len(usuario) != 1 or not check_password_hash(usuario[0]["password"], request.form.get("password")):
+               # print(usuario.password)
+                flash("ERROR") 
+               
+            else: 
+                print(usuario)
+                session["user_id"] = usuario[0]["id"] 
+                
                 return render_template("index.html")
             
-            else: 
-                flash("ERROR") 
 
     return render_template("login.html")
         
@@ -88,7 +93,7 @@ def register():
             flash("Ese nombre ya existe")
             return render_template("register.html")
 
-        nuevo_usuario = db.execute(f"INSERT INTO usuarios (username, password) VALUES(:username, :password) RETURNING id", {"username": username, "password": password}).fetchone()
+        nuevo_usuario = db.execute(f"INSERT INTO usuarios (username, password) VALUES(:username, :password) RETURNING id", {"username": username, "password": hash}).fetchone()
 
     session["user_id"] = nuevo_usuario
     db.commit()
@@ -118,6 +123,15 @@ def libro(isbn):
 
     if usuarios_id:
         libro = db.execute("SELECT * FROM libros WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
+        response = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn).json()
+        #print(response["items"][0] ["volumeInfo"]["averageRating"])
+        respon_api = response["items"][0] ["volumeInfo"]["averageRating"]
+
+        #if not respon_api:
+            
+        # return jsonify({
+        #     "response" : response
+        # })
         
         if libro is None:
             flash("error")
@@ -130,7 +144,7 @@ def libro(isbn):
                 db.commit()
                 return redirect(url_for("libro", isbn=isbn))
             else:
-                comentario = db.execute(" SELECT usuarios_id, comentario, puntaje, username FROM critica JOIN usuarios ON usuarios.id=critica.usuarios_id  WHERE libros_id=:libros_id ", {"libros_id": libro.id}).fetchall()
+                comentario = db.execute(" SELECT usuarios_id, comentario, puntaje, username FROM critica JOIN usuarios ON usuarios.id=critica.usuarios_id WHERE libros_id=:libros_id ", {"libros_id": libro.id}).fetchall()
 
                 lectura = {}
                 if current_app.config.get("llave"):
