@@ -13,39 +13,8 @@
         <tr><td>title</td><td>{{libro.title}}</td></tr>
         <tr><td>author</td><td>{{libro.author}}</td></tr>
         <tr><td>year</td><td>{{libro.year}}</td></tr>
-        <tr><td> puntaje</td><td>{{comentario.average_score}}</td></tr>
-        <tr><td> votos</td><td>{{comentario.review_count}}</td></tr>
     </table> <br>
  
-    {% set m = namespace(variablae = false) %}
-    {% if criticas %}
-        <table class="table table-success table-striped">
-            <tr><th>usuario</th>
-            <th>reseña</th>
-            <th>puntaje</th></tr>
-            {% for critica in criticas %}
-                {% if critica.user_id == user_id %}
-                    {% set m.variable = true %}
-                {% endif %}
-                <tr><td>{{critica.username}}</td>
-                <td>{{critica.comentario}}</td>
-                <td>{{critica.puntaje}}</td></tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p style="color: aliceblue;"> Este libro no tiene una critica si queres podes hacer una</p>
-    {% endif %}
-
-
-    <!-- {% if not m.variable %}
-        <p style="color: aliceblue;">criticaaaaaaaaaa</p>
-        {% if error %}
-        <p class="error">{{error}}</p>
-        {% endif %}
-     {% else %}
-        <p> Si hay critica </p>
-    {% endif %} -->
-        
         <form action="" method="post">
             <h4 style="color: aliceblue;">Opinion:</h4>
             <p>
