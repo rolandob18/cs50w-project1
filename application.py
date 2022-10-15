@@ -55,7 +55,7 @@ def login():
             
             if len(usuario) != 1 or not check_password_hash(usuario[0]["password"], request.form.get("password")):
                # print(usuario.password)
-                flash("ERROR") 
+                flash("Error usuario o contraseña incorrecta") 
                
             else: 
                 print(usuario)
@@ -123,16 +123,7 @@ def libro(isbn):
 
     if usuarios_id:
         libro = db.execute("SELECT * FROM libros WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
-        response = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn).json()
-        #print(response["items"][0] ["volumeInfo"]["averageRating"])
-        respon_api = response["items"][0] ["volumeInfo"]["averageRating"]
 
-        #if not respon_api:
-            
-        # return jsonify({
-        #     "response" : response
-        # })
-        
         if libro is None:
             flash("error")
         else:
